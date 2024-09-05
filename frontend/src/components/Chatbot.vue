@@ -19,6 +19,7 @@
             </div>
             <div class="input-area">
                 <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message here..." />
+                <button @click="sendMessage" class="send-button"><i class="fa-regular fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
@@ -137,12 +138,30 @@ export default {
 
 .input-area {
     display: flex;
+    align-items: center; /* Căn giữa theo chiều dọc */
+    padding: 10px;
+    background-color: #fff;
 }
 
 input {
     flex: 1;
     padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px; /* Thêm khoảng cách giữa input và nút */
+}
+
+.send-button {
+    background-color: #007bff;
+    color: white;
     border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    background-color: #0056b3; /* Hiệu ứng khi hover */
 }
 
 .bot-message-container {
