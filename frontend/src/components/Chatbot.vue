@@ -5,11 +5,16 @@
             <div v-else id="icon-close"><i class="fa-solid fa-minus"></i></div>
         </button>
         <div v-if="isOpen" class="chatbot">
+            <div class="chatbot-header">Chatbot Hỗ Trợ</div>
             <div class="chat-window">
                 <div v-for="(message, index) in messages" :key="index" class="message">
-                    <p :class="{ 'user-message': message.from === 'user', 'bot-message': message.from === 'bot' }">
-                        {{ message.text }}
-                    </p>
+                    <div v-if="message.from === 'bot'" class="bot-message-container">
+                        <img src="/logo.png" alt="Bot Avatar" class="bot-avatar" />
+                        <p class="bot-message">{{ message.text }}</p>
+                    </div>
+                    <div v-else class="user-message">
+                        <p style="margin:0px;">{{ message.text }}</p>
+                    </div>
                 </div>
             </div>
             <div class="input-area">
@@ -39,43 +44,78 @@ export default {
             if (this.userInput.trim()) {
                 this.messages.push({ text: this.userInput, from: 'user' });
 
+                await this.$nextTick(); // Đợi cập nhật DOM trước khi cuộn
+                this.scrollToBottom();
+
                 try {
                     const response = await ChatbotService.getMessageRasa({ message: this.userInput });
                     const botResponse = response.data.response || 'No response from server';
                     this.messages.push({ text: botResponse, from: 'bot' });
+
+                    await this.$nextTick();
+                    this.scrollToBottom(); // Cuộn xuống sau khi bot trả lời
                 } catch (error) {
                     console.error('Error:', error);
                     this.messages.push({ text: 'Error: Unable to get response from server', from: 'bot' });
+
+                    await this.$nextTick();
+                    this.scrollToBottom();
                 }
 
                 this.userInput = '';
             }
+        },
+        scrollToBottom() {
+            const chatWindow = this.$el.querySelector('.chat-window');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         },
     },
 };
 </script>
 
 <style scoped>
-
 .chatbot-container {
     position: fixed;
     bottom: 20px;
     right: 20px;
 }
 
-#icon-open{
+#icon-open {
     font-size: 25px;
-    padding: 10px;
-}
-
-.toggle-button{
-    padding: 5px 10px 5px 10px;
-    border: none;
+    padding: 10px 15px 10px 15px;
     background-color: #007bff;
     color: white;
     cursor: pointer;
     border-radius: 50%;
     z-index: 100;
+}
+
+#icon-close {
+    position: absolute; 
+    top: 20px;
+    right: 10px; 
+    font-size: 25px;
+    padding: 10px; 
+    cursor: pointer; 
+    color: white;
+    z-index: 100;
+}
+
+
+.toggle-button {
+    border: none;
+    background: none;
+}
+
+.chatbot-header{
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    text-align: center; /* Căn giữa theo chiều ngang */
+    font-weight: bold;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .chatbot {
@@ -105,13 +145,36 @@ input {
     border: none;
 }
 
-.user-message {
-    text-align: right;
-    color: #1d72b8;
+.bot-message-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.bot-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
 }
 
 .bot-message {
-    text-align: left;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 10px;
     color: #333;
+    max-width: 70%;
 }
+
+.user-message {
+    text-align: right;
+    background-color: #1d72b8;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    max-width: 70%;
+    margin-left: auto;
+}
+
 </style>
