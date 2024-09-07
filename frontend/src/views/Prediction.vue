@@ -13,8 +13,10 @@
                 <div v-else-if="error">{{ error }}</div>
             </div>
             <hr>
-            <div>
-                <ul>
+            <div v-if="imageUrl" class="image-container">
+                <h4>Uploaded Image:</h4>
+                <img :src="imageUrl" alt="Uploaded Image" style="width:400px; height:auto;" />
+                <ul v-if="diseases.length">
                     <li v-for="(disease, index) in diseases" :key="index">
                         <p style="font-size:20px;"><b>{{ index + 1 }}. {{ disease }}</b></p>
                     </li>
@@ -36,11 +38,14 @@ export default {
             loading: false,
             error: null,
             selectedFile: null,
+            imageUrl: null,
         };
     },
     methods: {
         onFileChange(event) {
+            this.diseases = [];
             this.selectedFile = event.target.files[0];
+            this.imageUrl = URL.createObjectURL(this.selectedFile); 
         },
         async uploadImage() {
             if (!this.selectedFile) {
@@ -71,6 +76,25 @@ export default {
 </script>
 
 <style scoped>
+
+
+.image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+    margin-top: 20px;
+}
+
+.image-container img {
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center; /* Center text */
+}
+
 .form-box {
     border: 1px solid #ccc;
     padding: 30px;
